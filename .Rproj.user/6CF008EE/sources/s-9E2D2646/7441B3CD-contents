@@ -1,0 +1,383 @@
+#The Greatest summary of all times
+#librairies
+library(scales)#This library allows to control the nuance of colors with the function alpha()
+library(nlme) #Groupdata
+library(lmerTest)
+library(MuMIn)
+library(pbkrtest)
+library(car)
+library(mvtnorm)
+library(dplyr)
+
+
+#data
+setwd("E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/Practicals")
+Electrode=read.table(file="Electrode.txt",header=T)
+df = read.table(file="Fat.txt",header=T)
+Mouse.dat <- read.csv(file="Mice.csv",header=T,sep=";")
+Metal <- read.table("Metal.txt", header=T)
+Poverty <- read.table("Poverty.txt", header=T)
+Semantic = read.table("Semantic.txt",header=T)
+semantic = read.table("Semantic.txt",header=T)
+orth <- read.table("Orth.txt", header=T)
+
+#changing data type
+sapply(Metal,class)#check data
+Metal[,"Lots"] <- as.factor(Metal[,"Lots"]) #change data
+Poverty[,"Subject"] <- as.factor(Poverty[,"Subject"])
+#even quicker
+Electrode[,2:3] <- lapply(Electrode[,2:3], as.factor)
+orth[,3:4] <- lapply(orth[,3:4], as.factor)
+Poverty[,2:4] <- lapply(Poverty[,2:4], as.factor)
+
+#Choose your contrasts
+contrasts(Metal$Type) <- "contr.sum"
+X <- model.matrix(~Metal$Type);X
+contrasts(Metal$Type) <- "contr.treatment"
+X <- model.matrix(~Metal$Type);X
+#if you want it to be more precise
+contrasts(Semantic$Condition) = contr.sum(3)#3 factors
+contrasts(Semantic$Delay) = contr.treatment(2,base=1)#2 factors and 1 is the reference group
+contrasts(Poverty$Gender) <- contr.sum(2)
+contrasts(Poverty$Origin) <- contr.sum(4)
+#or build them by hand, you fool!
+C<-matrix(0,4,6)
+C[1,]<-c(0,3,3,-2,-2,-2)
+C[2,]<-c(0,1,-1,0,0,0)
+C[3,]<-c(0,0,0,2,-1,-1)
+C[4,]<-c(0,0,0,0,1,-1)
+
+#fitting models
+fit.lmer.reml = lmer(Response~Type+(1|Lots/Sample/Chemist),data=Metal)
+semantic.lmer.reml <- lmer(Resp~Delay*Condition + (1|Subject), data=Semantic)
+ #example with 1 fixed effect (sex) and two random effects with age as model and subject as grouping structure
+ #this is a random intercept and slope model
+orth.lme.ml=lme(fixed=distance ~ Sex*age, data=orth, random=~age|Subject, method="ML")
+ #simple semantic: 1 random effect with random intercept as model
+lme(Resp~Delay*Condition,data=Semantic,random=~1|Subject)
+ #semantic with all as random effects and all possible interactions (except triple interaction) and subject as grouping factor
+lme(fixed=Resp~Delay*Condition, 
+    data=Semantic, 
+    random=list(Subject=pdBlocked(list(
+      pdIdent(~1),pdIdent(~Delay-1),pdIdent(~Condition-1)
+    ))))
+#others
+Metal.lme.ml <- lme(fixed=Response~Type,data=Metal,random=~1|Lots/Sample/Chemist)
+dentalH0.lme = lme(distance~Sex*age, data = orth,random = ~1 | Subject)
+dentalH1.lme = lme(distance~Sex*age, data = orth,random = ~age | Subject)
+orthH0.lme = lme(distance~Sex*age,data=orth,random=~1|Subject)
+orthH1.lme = lme(distance~Sex*age,data=orth,random=~age|Subject)
+ #What if you have more than one rand. eff. without a grouping factor? you create one!
+Electrode$dummy = factor(1)
+lme(fixed=log(Resis)~1,random=list(dummy = pdBlocked(list(pdIdent(~Subject-1),pdIdent(~Elec-1)))),data=Electrode)
+#NON-BIASED LMER
+lmer(log(Resis)~1+(1|Subject)+(1|Elec),data=Electrode)
+
+
+
+#Worth noting functions
+b <- cbind(1,2,3,4)
+apply(b,1,function(x) x^2-3*x+10) #applies the function on each element
+
+Matrice = matrix(b,ncol=4)
+rownames(Matrice) = "Row1"
+colnames(Matrice) = c("Col1","Col2","Col3","Col4")
+dimnames(Matrice)[[1]]
+
+
+
+#Model matrix creates the X matrix (named design matrix) from regression model
+X=model.matrix(lm(fat~.,data=df)); X
+Y=df[,1];Y
+beta_hat = solve(t(X)%*%X)%*%t(X)%*%Y;beta_hat
+#We can find the right coefficients following the formula of the variance of beta hat
+mod.lm = lm(Weight~Food,data=Mouse.dat)
+X=model.matrix(mod.lm)
+Z=solve(t(X)%*%X)
+sigma(mod.lm)^2*Z
+#Compute yourself the variance
+Z_1 <- ones(16,1)%x%diag(5)
+Z_2 <- diag(16)%x%ones(5,1)
+Z_0 <- diag(80)
+mu = (1+sqrt(5))/2
+sigma2_alpha = pi
+sigma2_s = exp(1)
+sigma2_epsilon = 1
+# Expected value
+E = X*mu
+# Variance
+Var1 = sigma2_alpha*Z_1%*%t(Z_1)+sigma2_s*Z_2%*%t(Z_2)+sigma2_epsilon*Z_0%*%t(Z_0)
+
+
+
+
+
+#List of plots used
+attach(Metal)
+#Boxplots: use it for heteroskedasticity, distribution
+boxplot(Response~Chemist,data=Metal)
+
+plot(resid(orth.lme.ml,type="p")~Subject,dat=orth,col="light gray",las=2)
+abline(h=0,col=2)
+
+boxplot(ranef(Metal.lme.ml)$Lots,main="Lots",ylab="Random effects")
+#Plot design: shows variability of your factors, i.e. heteroskedasticity
+plot.design(Response~.,data=Metal)
+plot.design(Poverty)
+#Interaction plot: does one marginal effect depend on its relative position on the characteristics space?
+interaction.plot(Metal$Chemist,Metal$Type,Metal$Response)
+#Groupdata: shows complex dependent structure->do we need random slopes
+Metal.gpData2 <- groupedData(Response~Type|Lots,data=Metal,order.groups=F,
+                             label=list(x="Lots",y="Metal content"),
+                             units=list(y="(percent by weight)"))
+plot(Metal.gpData2,outer=~Sample*Chemist)
+plot(orth.lme.ml, Subject ~ resid(., type = "p")|Sex, abline = 0,grid=T)
+
+#qqplots
+qqnorm(ranef(orth.lme.ml)[,1],pch=16,main="Intercept")
+qqline(ranef(orth.lme.ml)[,1],col=2,lwd=2,lty=2)
+#scatterplots with pairs(): check independency
+pairs(orth.lme.ml,~ranef(.)|Sex,id=0.05,grid=T,abline=0)
+#Histogram example
+#notice the use of alpha() for the color and the axis naming
+hist_obj = hist(df[,'fat'],breaks=4,plot=F)
+plot(hist_obj,
+     col=alpha("palevioletred",0.6), 
+     border="white", freq=FALSE,
+     main='',xaxt='n',yaxt='n',xlab='',ylab='')
+title(xlab="Fat %",font.lab=3, line=2.5, cex.lab=1.2)
+title(ylab='Density',font.lab=3, line=2.5, cex.lab=1.2)
+rg_x = range(hist_obj$breaks)
+rg_y = range(c(0,hist_obj$density))
+
+axis(1, at=c(rg_x[1],mean(rg_x),rg_x[2]), labels=c(rg_x[1],mean(rg_x),rg_x[2]),
+     cex=1,
+     padj=-0.3)
+axis(2, at=c(0,rg_y[2]), labels=c(0, round(rg_y[2],digit=2) ),
+     cex=1,padj=0.3,line=-0.5)
+title("Histogram of variable Fat")
+
+
+#Simulation
+#simulate through the error term of the model, regress it, compute the test statistic
+
+#check coverage with the following code:
+isin.fun =function(ci,theta){
+  if(!any(is.na(ci))){
+    if(theta>=ci[1]&theta<=ci[2]){T}else{F}
+  }else{
+    NA
+  }
+}
+mean(apply(cbind(mx.conf.B1,Beta.hat[2]),1,function(x)isin.fun(x[1:2],x[3])))
+
+
+
+#Prediction
+head(random.effects(orth.lme.ml))
+orth.pred01 <- predict(orth.lme.ml,level=0:1)
+head(orth.pred01[order(orth.pred01$Subject),])
+## Population predictions
+pred0 = predict(orth.lme.ml, level = 0)
+pred0 = pred0[order(names(pred0))]
+orth.pred0 = matrix(pred0, ncol=4, byrow=T)
+dimnames(orth.pred0) = list(names(table(names(pred0))),c("age = 8","age = 10","age = 12","age = 14"))
+head(orth.pred0)
+## Subject predictions
+pred1 = predict(orth.lme.ml, level = 1)
+pred1 = pred1[order(names(pred1))]
+orth.pred1 = matrix(pred1, ncol=4, byrow=T)
+dimnames(orth.pred1) = list(names(table(names(pred1))),c("age = 8","age = 10","age = 12","age = 14"))
+head(orth.pred1)
+
+
+#Inference
+ #anova
+anova(semantic.lmer.reml,type="I")#type I = sequential
+anova(semantic.lmer.reml,type="II")
+anova(semantic.lmer.reml,type="III") #type III = marginal this ain't type III
+anova(semantic.lmer.reml,type="II",ddf="Kenward-Roger")
+Anova(semantic.lmer.reml,type="II",test.statistic="F")
+Anova(semantic.lmer.reml,type="III",test.statistic="F")
+   #anova by hand
+pbkrtest::KRmodcomp(lmer(Resp~Delay+ (1|Subject), data=semantic),
+                    lmer(Resp~Delay+Condition+ (1|Subject), data=semantic))
+ #Confidence intervals
+intervals(semantic.lme.reml)
+confint(semantic.lmer.reml,method="Wald")
+confint(semantic.lmer.reml,method="profile")
+confint(semantic.lmer.reml,method="boot")
+ # Criterions
+  #AIC, BIC, Likelihood ratio
+anova(orthH0.lme,orthH1.lme)
+  #R squared
+MuMIn::r.squaredGLMM(semantic.lmer.reml)
+
+
+#Simulation
+B=1000
+ #using getME()
+model = lmer(Response~Type + (1 | Lots/Sample/Chemist), data = Metal)
+X = getME(model,'X')
+beta = getME(model,"beta")
+Z = getME(model,"Z")
+sigma2 = sigma(model)^2
+lambda = getME(model,"Lambda")
+Psi = lambda%*%t(lambda)*sigma2
+Omega = Z %*% Psi %*% t(Z) + sigma2*Diagonal(nrow(Z))
+simus = list()
+set.seed(111)
+# for(i in 1:B){
+#   Y = c(rmvnorm(n=1, mean=X%*%beta, sigma=as.matrix(Omega)))
+#   simus[[i]] = Y
+# }
+#save your results for long simulations
+# save(simus,file="simus_mixed2.rdata")
+#and load them next time you want to use them
+simus = get(load(file="simus_mixed1.rdata"))
+ #by hand
+Metal$Response = as.numeric(as.character(Metal$Response))
+Metal$Lots = paste0("L",format(Metal$Lots))
+Metal$Sample = paste0(Metal$Lots,"-","S",gsub("Sample","",Metal$Sample))
+Metal$Chemist = paste0(Metal$Sample,"-","C",gsub("Chemist","",Metal$Chemist))
+# generate the X matrix:
+X = model.matrix(~Type, data=Metal)
+# generate the Z matrices:
+Z1 = model.matrix(~Lots-1, data=Metal)
+Z2 = model.matrix(~Sample-1, data=Metal)
+Z3 = model.matrix(~Chemist-1, data=Metal)
+# deﬁne parameters:
+fit.lmer.reml = lmer(Response~Type+(1|Lots/Sample/Chemist),data=Metal)
+temp = summary(fit.lmer.reml)
+beta = coef(temp)[,"Estimate"]
+sigma_1 = sqrt(temp$varcor$Lots[1])
+sigma_2 = sqrt(temp$varcor$`Sample:Lots`[1])
+sigma_3 = sqrt(temp$varcor$`Chemist:(Sample:Lots)`[1])
+sigma_e = sigma(fit.lmer.reml)
+# create the object simus to store simulations:
+simus = matrix(NA, ncol=B, nrow=nrow(X))
+# set seed:
+set.seed(111)
+# use a for loop to generate response vectors and store results in simus:
+# for(i in 1:B){
+#   u1 = rnorm(rep(0,ncol(Z1)),sigma_1)
+#   u2 = rnorm(rep(0,ncol(Z2)),sigma_2)
+#   u3 = rnorm(rep(0,ncol(Z3)),sigma_3)
+#   e = rnorm(rep(0,nrow(X)),sigma_e)
+#   Y = X%*%beta + Z1%*%u1 + Z2%*%u2 + Z3%*%u3 + e
+#   simus[ , i] = Y
+# }
+#
+# save(simus,file="simus_mixed2.rdata")
+#
+simus = get(load(file="simus_mixed2.rdata"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Hand-made functions
+simu_Y <- function(X,betas,intercept=F,sigma_known=T,sigma_estim=NULL){
+  if(intercept) X = cbind(rep(1,nrow(X)),X)
+  if(length(betas)!=1){
+    Z <- X%*%betas
+    k <- nrow(Z)
+  }else{
+    Z <- X*betas
+    k <- length(Z)
+  }
+  if(sigma_known) epsilon <- rnorm(k) else epsilon <- rnorm(k,sd=sigma_estim)
+  y <- cbind(Z) + cbind(epsilon)
+  y
+}
+compute_MLE <- function(y,X,sigma_known=T){
+  mod <- lm(y~X)
+  beta_hat <- coefficients(mod)[2]
+  if(!sigma_known){
+    std_error <- coefficients(summary(mod))[2,2]
+    p_value <- coefficients(summary(mod))[2,4]
+    std_resid <- sigma(mod)
+    return(list(beta_hat=beta_hat,std_error=std_error,std_resid=std_resid,p_value=p_value))
+  }
+  beta_hat
+}
+confints_MLE <- function(beta_hat,known_sigma2_epsilon,X,n,level){
+  var_mle <- known_sigma2_epsilon/((sd(X)*sqrt(n))^2)
+  alpha <- 1-level
+  c(beta_hat-qnorm(1-alpha/2)*sqrt(var_mle),beta_hat+qnorm(1-alpha/2)*sqrt(var_mle))
+}
+coverage <- function(confints,beta){
+  truth <- beta
+  cover <- (truth >= confints[,1])*(truth <= confints[,2])
+  sum(cover)/length(cover)
+}
+
+ones = function(n,p) matrix(rep(1,n*p),nrow=n)
+
+omega_plot=function(Omega,legend=TRUE,axes=TRUE){
+  corw = cov2cor(Omega)
+  if(any(corw<0)){
+    colw=c(gray(1),gg_color(98),gray(.9),gg_color(198)[101:198],gray(0))
+    zlim=c(-1,1)
+  }else{
+    colw=c(gray(.9),gg_color(98),gray(0))
+    zlim=c(0,1)
+  }
+  image(z=as.matrix(corw[nrow(corw):1,]),zlim=zlim,axes=FALSE,col=colw)
+  if(legend){    
+    valw = as.numeric(names(table(as.matrix(corw))))  
+    posw = round(valw*length(colw))
+    posw[posw==0] = 1
+    posw[posw>length(colw)] = length(colw)    
+    legend("topright",ncol=1,legend=format(round(valw,4)),
+           col=colw[posw],pch=15,bg="light gray",
+           title="Values",box.lwd=NA)
+  }
+  if(axes){
+    axis(3,at=seq(0,1,length=nrow(Omega)),labels=FALSE)
+    axis(2,at=seq(0,1,length=nrow(Omega)),labels=FALSE)
+    axis(2,at=c(1,0),c(1,nrow(Omega)),las=2)
+    axis(3,at=c(0,1),c(1,nrow(Omega)),las=1)
+  }
+}
+simu_Y_mixef <- function(X,beta,Z,sigma_ranef,sigma_epsilon){
+  n <- length(X)
+  epsilon <- rnorm(n,0,sigma_epsilon)
+  u <- rnorm(q1,0,sigma_ranef)
+  y <- X*beta + Z%*%u + epsilon
+}
+

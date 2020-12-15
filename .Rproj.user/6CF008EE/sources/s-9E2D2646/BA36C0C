@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1608038102364.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "BA36C0C",
+    "lastKnownWriteTime" : 1608043046,
+    "last_content_update" : 1608043046749,
+    "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/DATA exam/MLM_Project/Fun.R",
+    "project_path" : "Fun.R",
+    "properties" : {
+        "cursorPosition" : "46,57",
+        "scrollLine" : "31",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

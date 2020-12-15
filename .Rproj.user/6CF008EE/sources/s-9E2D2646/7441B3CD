@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1608038170669.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7441B3CD",
+    "lastKnownWriteTime" : 1608042039,
+    "last_content_update" : 1608042039040,
+    "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/Practicals/Summary.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "127,47",
+        "scrollLine" : "114"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
