@@ -44,7 +44,7 @@ Chemo[,"line"] <- as.factor(Chemo[,"line"]);
 # Chemo[,"month"] <- as.factor(Chemo[,"month"])
 
 
-# Main features -------------------------------------------------------------------
+# Overview tumour/sensitivity -------------------------------------------------------------------
 
 #I want to see the evolution of the tumour through time:
 #month should be re-indexed and restart to 0 for each new patient
@@ -92,9 +92,9 @@ text(5,-1.5,labels="James Stein Mean",col="blue")
 
 #Now the same with the evolution of sensitivity
 plot(Chemo[patient==LETTERS[1],"month"],Chemo[patient==LETTERS[1],"sensitivity"],
-     type="l",main="Resistance to the drug combination of interest",
+     type="l",main="Sensitivity to the drug combination of interest",
      xlab = "Time in months",ylab = "Sensitivity",
-     xlim=c(0,14),ylim =c(0,1))
+     xlim=c(0,14),ylim =c(-0.1,1))
 for (i in 2:19){
   lines(Chemo[patient==LETTERS[i],"month"],Chemo[patient==LETTERS[i],"sensitivity"],type="l",col=rand_color(1))
 }
@@ -108,7 +108,7 @@ for (i in 1:19){
 lines(seq(14),moyenne_sens,type="l",col="red",lwd=5)
 text(0.25,0.65,labels="Mean",col="red")
 
-#J-S mean
+#J-S mean #acts weird, I surely made a mistake
 #first, we need its variance
 variance_sens=rep(0,14)
 for (i in 1:19){
@@ -130,6 +130,9 @@ text(1.5,0.25,labels="James Stein Mean",col="blue")
 
 
 # PLOTS -------------------------------------------------------------------
+#I transformed data, I have to re-set it to its original values
+Chemo = read.table(file="Chemotherapy-version1.csv",header=TRUE,sep=",")
+Chemo[,"line"] <- as.factor(Chemo[,"line"]);
 
 
 #study data with plots
