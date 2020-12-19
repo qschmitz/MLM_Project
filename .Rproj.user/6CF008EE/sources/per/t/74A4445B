@@ -5,21 +5,21 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "2636744013",
+    "hash" : "1076142133",
     "id" : "74A4445B",
-    "lastKnownWriteTime" : 1608038033,
-    "last_content_update" : 1608038033193,
-    "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/DATA exam/MLM_Project/Plan of work.R",
+    "lastKnownWriteTime" : 1608392566,
+    "last_content_update" : 1608392566516,
+    "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/MLM_Project/Plan of work.R",
     "project_path" : "Plan of work.R",
     "properties" : {
-        "cursorPosition" : "59,0",
-        "scrollLine" : "0",
+        "cursorPosition" : "78,18",
+        "scrollLine" : "68",
         "tempName" : "Untitled1"
     },
     "read_only" : false,
     "read_only_alternatives" : [
     ],
-    "relative_order" : 1,
+    "relative_order" : 2,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_source"

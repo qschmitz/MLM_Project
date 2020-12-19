@@ -12,13 +12,13 @@
     "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/Practicals/Summary.R",
     "project_path" : null,
     "properties" : {
-        "cursorPosition" : "10,0",
-        "scrollLine" : "12"
+        "cursorPosition" : "131,9",
+        "scrollLine" : "116"
     },
     "read_only" : false,
     "read_only_alternatives" : [
     ],
-    "relative_order" : 2,
+    "relative_order" : 1,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_source"

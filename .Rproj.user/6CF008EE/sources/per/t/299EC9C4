@@ -9,7 +9,7 @@
     "id" : "299EC9C4",
     "lastKnownWriteTime" : 1608037960,
     "last_content_update" : 1608037960050,
-    "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/DATA exam/MLM_Project/Report.Rmd",
+    "path" : "E:/Universite de Genève/Faculté d'économie/Mon Master en statistique/A1S1/Mixed Linear Models/MLM_Project/Report.Rmd",
     "project_path" : "Report.Rmd",
     "properties" : {
         "cursorPosition" : "1,0",
@@ -19,7 +19,7 @@
     "read_only" : false,
     "read_only_alternatives" : [
     ],
-    "relative_order" : 6,
+    "relative_order" : 5,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_markdown"

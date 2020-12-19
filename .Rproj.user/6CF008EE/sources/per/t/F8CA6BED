@@ -12,21 +12,21 @@
     "path" : null,
     "project_path" : null,
     "properties" : {
-        "cacheKey" : "F015DDF7",
+        "cacheKey" : "D3EB97F",
         "caption" : "Chemo",
-        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Chemo&cache_key=F015DDF7",
-        "displayedObservations" : 137,
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Chemo&cache_key=D3EB97F",
+        "displayedObservations" : "137",
         "environment" : "",
         "expression" : "Chemo",
         "object" : "Chemo",
-        "preview" : 0,
-        "totalObservations" : 137,
-        "variables" : 5
+        "preview" : "0",
+        "totalObservations" : "137",
+        "variables" : "5"
     },
     "read_only" : false,
     "read_only_alternatives" : [
     ],
-    "relative_order" : 5,
+    "relative_order" : 4,
     "source_on_save" : false,
     "source_window" : "",
     "type" : "r_dataframe"
