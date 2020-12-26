@@ -126,14 +126,14 @@ plot.design(Response~.,data=Metal)
 plot.design(Poverty)
 #Interaction plot: does one marginal effect depend on its relative position on the characteristics space?
 interaction.plot(Metal$Chemist,Metal$Type,Metal$Response)
-#Groupdata: shows complex dependent structure->do we need random slopes
+#Groupdata: shows complex dependent structure->do we need random slopes -> is there heteroskedasticity
 Metal.gpData2 <- groupedData(Response~Type|Lots,data=Metal,order.groups=F,
                              label=list(x="Lots",y="Metal content"),
                              units=list(y="(percent by weight)"))
 plot(Metal.gpData2,outer=~Sample*Chemist)
 plot(orth.lme.ml, Subject ~ resid(., type = "p")|Sex, abline = 0,grid=T)
 
-#qqplots
+#qqplots->normality
 qqnorm(ranef(orth.lme.ml)[,1],pch=16,main="Intercept")
 qqline(ranef(orth.lme.ml)[,1],col=2,lwd=2,lty=2)
 #scatterplots with pairs(): check independency

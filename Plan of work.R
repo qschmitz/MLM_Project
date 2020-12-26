@@ -62,9 +62,10 @@ for (i in 1:19){
 # • Write a first version of your model that include potential interactions
 #patient: i, line: l, month: m, sensitivity: s
   #Y_{ilms} = \mu + \alpha_l \+ \beta_s + (\alpha_l \cdot \beta_s) + \delta_m + \gamma_s + zeta_i +epsilon_ilms
-  lmer_Chemo = lmer(tumour~line*sensitivity+month+(1|patient),data=Chemo)
-  lme_Chemo = lme(fixed=tumour~line*sensitivity+month, random=~1|patient,data=Chemo, method="ML")
-
+  lmer_Chemo = lmer(tumour~line*sensitivity+month*line+(1|patient),data=Chemo)
+summary(lmer_Chemo)
+  lme_Chemo = lme(fixed=tumour~line*sensitivity+month*line, random=~1|patient,data=Chemo, method="ML")
+summary(lmr_Chemo)
 # 4.2 Exploratory data analysis ----------------------------------------------
 
 # • check if the model’s assumptions hold:
@@ -77,11 +78,11 @@ interaction.plot(line,patient,tumour)#line has an increasing effect on the patie
 
 # – equal variance of the responses around the different factor’s levels
 plot.design(Chemo)
-Chemo.gpdata = groupedData(tumour~line|patient,data=Chemo,order.groups=F,
-                           label=list(x="Patients",y="Tumour response"),
-                           units=list(y="(percent by weight)"))
-plot(Chemo.gpdata,outer=~sensitivity*line)
-plot(orth.lme.ml, Subject ~ resid(., type = "p")|Sex, abline = 0,grid=T)
+# Chemo.gpdata = groupedData(tumour~line|patient,data=Chemo,order.groups=F,
+                           # label=list(x="Patients",y="Tumour response"),
+                           # units=list(y="(percent by weight)"))
+# plot(Chemo.gpdata,outer=~sensitivity*line)
+
 
 
 # – presence or absence of interactions between the different “explanatory variables”
