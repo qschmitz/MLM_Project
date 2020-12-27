@@ -29,7 +29,13 @@ library(dplyr)
 library(circlize)
 Chemo = read.table(file="Chemotherapy-version1.csv",header=TRUE,sep=",")
 attach(Chemo)
-Chemo[,"line"] <- as.factor(Chemo[,"line"]);
+Chemo[,"line"] <- as.factor(Chemo[,"line"])
+
+#merge levels 3,4 and 5 of line in one level (+3) as asked in the 2nd question
+levels(Chemo[,"line"])<-c("1","2","+3","4","5")
+levels(Chemo[,"line"])[levels(Chemo[,"line"])=="4"] <-"+3"
+levels(Chemo[,"line"])[levels(Chemo[,"line"])=="5"] <-"+3"
+
 #re-indexing months
 chemo=Chemo
 for (i in 1:19){
