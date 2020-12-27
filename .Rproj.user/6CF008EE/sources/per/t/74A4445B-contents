@@ -30,6 +30,9 @@ library(circlize)
 Chemo = read.table(file="Chemotherapy-version1.csv",header=TRUE,sep=",")
 attach(Chemo)
 Chemo[,"line"] <- as.factor(Chemo[,"line"]);
+Chemo[,"month"]  <- as.factor(Chemo[,"month"]);
+Chemo[,"month"]  <- as.integer(Chemo[,"month"]);
+sapply(Chemo,class)
 #re-indexing months
 chemo=Chemo
 for (i in 1:19){
@@ -41,43 +44,61 @@ for (i in 1:19){
 # • Define:
 #– what are the independent experiment units (subjects, households, lots, ...)
   #We have only within-subject factors
-  #Patients are independent of each other
+  #Patients are the independent experiment units
 #– the role of the different variables in your analysis:
 #   ∗ which variable is the response ?
       #tumour
 #   ∗ which variables are covariates ?
-    #interaction between patient and line (different people react differently to treatment)
-    #interaction between line and month (month 1 has not the same effect if it is in line 1 or 5)(this interaction disappears if we re-index the months)
+      # all the others
 #   ∗ which variables are factors ?
-    #patient, line   
+      #patient, line   
 #   ∗ Are the covariates and factors fixed or random effects ? (justify)
     #R.E. : patients (we do not exhaust the population, they do not brings explaination,levels chosen randomly)
     #F.E. : line (regressor), month (nested in line), sensitivity
 # ∗ Are the factors crossed, nested, ... ?
-#
+    # months is nested in line
 # • Check if the class of your variables correspond to your needs:
-#   – class numeric for the response: tumour
-# – class numeric or integer covariates like age, ... : month,sensitivity
-# – class factor or ordered for factors like subject, gender, ...: patient, line
+#   – class numeric for the response:
+        #tumour
+# – class numeric or integer covariates like age, ... : 
+        # month,sensitivity
+# – class factor or ordered for factors like subject, gender, ...:
+        # patient, line
 # • Write a first version of your model that include potential interactions
 #patient: i, line: l, month: m, sensitivity: s
   #Y_{ilms} = \mu + \alpha_l \+ \beta_s + (\alpha_l \cdot \beta_s) + \delta_m + \gamma_s + zeta_i +epsilon_ilms
-  lmer_Chemo = lmer(tumour~line*sensitivity+month*line+(1|patient),data=Chemo)
+  
+lmer_Chemo = lmer(tumour~line*sensitivity+month*line+(month|patient),data=Chemo)
 summary(lmer_Chemo)
   lme_Chemo = lme(fixed=tumour~line*sensitivity+month*line, random=~1|patient,data=Chemo, method="ML")
-summary(lmr_Chemo)
+summary(lme_Chemo)
 # 4.2 Exploratory data analysis ----------------------------------------------
 
 # • check if the model’s assumptions hold:
 #   – linearity of the relation between the covariates and the response
-interaction.plot(sensitivity,month,tumour)#is sensitivity affecting the month effect on tumour?
-interaction.plot(month,sensitivity,tumour)#month has no interaction with sensitivity
-interaction.plot(month,patient,tumour)#neither has it on any patient
-interaction.plot(month,line,tumour)#HA-HAAAAA MONTH HAS AN INTERACTION WITH LINE 5
+#sensitivity and tumour should be used as response variable
+#clear interaction between month and line to determine sensitivity or tumour
+interaction.plot(line,month,tumour)
+interaction.plot(month,line,tumour)
+interaction.plot(line,month,sensitivity)
+interaction.plot(month,line,sensitivity)
+#interaction between line and sensitivity?
+interaction.plot(line,sensitivity,tumour)
+interaction.plot(sensitivity,line,tumour)
+
 interaction.plot(line,patient,tumour)#line has an increasing effect on the patient effect on tumour
 
 # – equal variance of the responses around the different factor’s levels
 plot.design(Chemo)
+    # to equal variance is to use the ANOVA tests
+anova(lme_Chemo,type="sequential")#effect of sequentially adding each new element
+    # sensitivity, its interaction and the interaction of line and month not significant
+Anova(lme_Chemo,type="II")#effect of each element to the whole
+    # all become more significant, line:sensitivity is statistically significant
+Anova(lme_Chemo,type="III")#effect of each element to the whole (with interactions)
+    #they are all significant apart from interaction between line and month.
+#CONCLUSION: get interaction of line and month out of the model
+
 # Chemo.gpdata = groupedData(tumour~line|patient,data=Chemo,order.groups=F,
                            # label=list(x="Patients",y="Tumour response"),
                            # units=list(y="(percent by weight)"))
