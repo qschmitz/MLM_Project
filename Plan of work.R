@@ -86,6 +86,10 @@ summary(lme_Chemo)
 
 # • check if the model’s assumptions hold:
 #   – linearity of the relation between the covariates and the response
+# -> only for integer or continuous covariates, by definition useless for factors
+plot(tumour~sensitivity, data=Chemo) # linearity seems ok, no quadratic (or else) pattern emerges
+plot(tumour~month, data=chemo) #used indexed months, linearity also seems ok
+
 #sensitivity and tumour should be used as response variable
 #clear interaction between month and line to determine sensitivity or tumour
 interaction.plot(line,month,tumour)
