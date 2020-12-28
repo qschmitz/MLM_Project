@@ -29,12 +29,11 @@ library(dplyr)
 library(circlize)
 Chemo = read.table(file="Chemotherapy-version1.csv",header=TRUE,sep=",")
 attach(Chemo)
-<<<<<<< HEAD
+
 Chemo[,"line"] <- as.factor(Chemo[,"line"]);
 Chemo[,"month"]  <- as.factor(Chemo[,"month"]);
 Chemo[,"month"]  <- as.integer(Chemo[,"month"]);
 sapply(Chemo,class)
-=======
 Chemo[,"line"] <- as.factor(Chemo[,"line"])
 
 #merge levels 3,4 and 5 of line in one level (+3) as asked in the 2nd question
@@ -42,7 +41,6 @@ levels(Chemo[,"line"])<-c("1","2","+3","4","5")
 levels(Chemo[,"line"])[levels(Chemo[,"line"])=="4"] <-"+3"
 levels(Chemo[,"line"])[levels(Chemo[,"line"])=="5"] <-"+3"
 
->>>>>>> eafffc1bbd6304b590365ac9fa07f090ce1e4916
 #re-indexing months
 chemo=Chemo
 for (i in 1:19){
@@ -86,9 +84,8 @@ summary(lme_Chemo)
 
 # • check if the model’s assumptions hold:
 #   – linearity of the relation between the covariates and the response
-# -> only for integer or continuous covariates, by definition useless for factors
-plot(tumour~sensitivity, data=Chemo) # linearity seems ok, no quadratic (or else) pattern emerges
-plot(tumour~month, data=chemo) #used indexed months, linearity also seems ok
+source('sections/4.2.linearity.r')
+
 
 #sensitivity and tumour should be used as response variable
 #clear interaction between month and line to determine sensitivity or tumour
