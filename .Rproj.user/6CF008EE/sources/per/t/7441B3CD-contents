@@ -125,8 +125,10 @@ boxplot(ranef(Metal.lme.ml)$Lots,main="Lots",ylab="Random effects")
 plot.design(Response~.,data=Metal)
 plot.design(Poverty)
 #Interaction plot: does one marginal effect depend on its relative position on the characteristics space?
+#are the increments parallel or dependent of the level of the other factor
+#for noisy data: are the pattern within each subject identical?
 interaction.plot(Metal$Chemist,Metal$Type,Metal$Response)
-#Groupdata: shows complex dependent structure->do we need random slopes -> is there heteroskedasticity
+#Groupdata: shows complex dependent structure->do we need random slopes -> is there heteroskedasticity (what are our groups?)
 Metal.gpData2 <- groupedData(Response~Type|Lots,data=Metal,order.groups=F,
                              label=list(x="Lots",y="Metal content"),
                              units=list(y="(percent by weight)"))

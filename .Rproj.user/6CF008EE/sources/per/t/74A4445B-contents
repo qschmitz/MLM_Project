@@ -27,14 +27,14 @@ library(car)
 library(mvtnorm)
 library(dplyr)
 library(circlize)
+library(lmtest)
 Chemo = read.table(file="Chemotherapy-version1.csv",header=TRUE,sep=",")
 attach(Chemo)
-<<<<<<< HEAD
+
 Chemo[,"line"] <- as.factor(Chemo[,"line"]);
 Chemo[,"month"]  <- as.factor(Chemo[,"month"]);
 Chemo[,"month"]  <- as.integer(Chemo[,"month"]);
 sapply(Chemo,class)
-=======
 Chemo[,"line"] <- as.factor(Chemo[,"line"])
 
 #merge levels 3,4 and 5 of line in one level (+3) as asked in the 2nd question
@@ -42,7 +42,6 @@ levels(Chemo[,"line"])<-c("1","2","+3","4","5")
 levels(Chemo[,"line"])[levels(Chemo[,"line"])=="4"] <-"+3"
 levels(Chemo[,"line"])[levels(Chemo[,"line"])=="5"] <-"+3"
 
->>>>>>> eafffc1bbd6304b590365ac9fa07f090ce1e4916
 #re-indexing months
 chemo=Chemo
 for (i in 1:19){
@@ -86,6 +85,9 @@ summary(lme_Chemo)
 
 # • check if the model’s assumptions hold:
 #   – linearity of the relation between the covariates and the response
+source('sections/4.2.linearity.r')
+
+
 #sensitivity and tumour should be used as response variable
 #clear interaction between month and line to determine sensitivity or tumour
 interaction.plot(line,month,tumour)
@@ -99,7 +101,9 @@ interaction.plot(sensitivity,line,tumour)
 interaction.plot(line,patient,tumour)#line has an increasing effect on the patient effect on tumour
 
 # – equal variance of the responses around the different factor’s levels
+
 plot.design(Chemo)
+
     # to equal variance is to use the ANOVA tests
 anova(lme_Chemo,type="sequential")#effect of sequentially adding each new element
     # sensitivity, its interaction and the interaction of line and month not significant
@@ -109,12 +113,38 @@ Anova(lme_Chemo,type="III")#effect of each element to the whole (with interactio
     #they are all significant apart from interaction between line and month.
 #CONCLUSION: get interaction of line and month out of the model
 
-# Chemo.gpdata = groupedData(tumour~line|patient,data=Chemo,order.groups=F,
-                           # label=list(x="Patients",y="Tumour response"),
-                           # units=list(y="(percent by weight)"))
-# plot(Chemo.gpdata,outer=~sensitivity*line)
+#Graph shows not heteroskedasticity
+plot(lme_Chemo)
+#Breusch-Pagan test: we cannot reject H_0: Homoskedasticity
+bptest(lme_Chemo)
 
-
+#We see the same residual patterns for all month
+Chemo.gpdata = groupedData(tumour~sensitivity|month,data=Chemo,order.groups=F,
+                            label=list(x="Sensitivity",y="Tumour response"),
+                            units=list(y="(percent by weight)"))
+plot(Chemo.gpdata)
+#Patients do not have the same sensitivity evolution at all!
+#All lot of our estimates are overestimated
+Chemo.gpdata = groupedData(tumour~sensitivity|patient,data=Chemo,order.groups=F,
+                           label=list(x="Sensitivity",y="Tumour response"),
+                           units=list(y="(percent by weight)"))
+plot(Chemo.gpdata)
+#Tumour cannot serve as random slope for sensitivity
+Chemo.gpdata = groupedData(sensitivity~tumour|patient,data=Chemo,order.groups=F,
+                           label=list(x="Tumour",y="Sensitivity"),
+                           units=list(y="(percent by weight)"))
+plot(Chemo.gpdata)
+#Month looks like a candidate for a random slope but with a lot of disturbance
+Chemo.gpdata = groupedData(tumour~month|patient,data=Chemo,order.groups=F,
+                           label=list(x="Tumour",y="Sensitivity"),
+                           units=list(y="(percent by weight)"))
+plot(Chemo.gpdata)
+#No patients seems strange
+Chemo.gpdata = groupedData(tumour~line|patient,data=Chemo,order.groups=F,
+                           label=list(x="Tumour",y="Sensitivity"),
+                           units=list(y="(percent by weight)"))
+plot(Chemo.gpdata)
+#CONCLUSION:get interaction of line and month out of the model, use month as random slope, no heteroskedasticity
 
 # – presence or absence of interactions between the different “explanatory variables”
 boxplot(tumour~patient,main="Tumour responses per patient")#is 19 enough to diagnose patient heteroskedasticity?
