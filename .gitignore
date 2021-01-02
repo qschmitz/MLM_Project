@@ -1,3 +1,9 @@
+.Rproj.user
+.Rhistory
+.Rdata
+MLM_Project.Rproj
+
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -274,4 +280,4 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
-.Rproj.user
+
