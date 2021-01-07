@@ -136,6 +136,11 @@ plot(Metal.gpData2,outer=~Sample*Chemist)
 plot(orth.lme.ml, Subject ~ resid(., type = "p")|Sex, abline = 0,grid=T)
 
 #qqplots->normality
+#of residuals
+#(with plot to see per levels of a factor)
+plot(orth.lme.ml, form = resid(., type = "p")~fitted(.)|Subject, abline = 0, id = 0.05)
+qqnorm(resid(orth.lme.ml),main="Residual\nQ-Q plot",pch=16)
+#of random effects
 qqnorm(ranef(orth.lme.ml)[,1],pch=16,main="Intercept")
 qqline(ranef(orth.lme.ml)[,1],col=2,lwd=2,lty=2)
 #scatterplots with pairs(): check independency
