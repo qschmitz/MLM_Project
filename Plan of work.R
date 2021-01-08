@@ -88,9 +88,9 @@ lmer_Chemo = lmer(tumour~line*sensitivity+month*line+(month|patient),data=Chemo)
 lme_Chemo = lme(fixed=tumour~line*sensitivity+month*line, random=~1|patient,data=Chemo, method="ML")
   summary(lme_Chemo)
 
-lmer_Chemo = lmer(tumour~sensitivity*line+month*line+(1|patient),data=Chemo)
+lmer_Chemo = lmer(tumour~sensitivity*line+month*line+(month|patient),data=chemo)
   summary(lmer_Chemo)
-lme_Chemo = lme(fixed=tumour~sensitivity*line+month*line, random=~1|patient,data=Chemo, method="ML")
+lme_Chemo = lme(fixed=tumour~sensitivity*line+month*line, random=~month|patient,data=chemo, method="ML")
   summary(lme_Chemo)
 # the variance of the random slope is almost null...is it really a random slope?
 
