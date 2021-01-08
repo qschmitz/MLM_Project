@@ -128,6 +128,21 @@ anova(lme_Chemo_no_interact,lme_Chemo_interact_month)
 
 #we should keep interaction between month and line and retrieve the other.
 
+#should we add to the model an interaction between line and patient or month and patient?
+lme_Chemo_interact_month=lme(fixed=tumour~sensitivity+line*month,random=~1|patient,data=Chemo,method='ML')
+summary(lme_Chemo_interact_month)
+lme_Chemo_interact_monthb=lme(fixed=tumour~sensitivity+line*month,random=list(patient=pdBlocked(list(pdIdent(~1), pdIdent(~month-1)))),data=Chemo,method='ML')
+summary(lme_Chemo_interact_monthb)
+lme_Chemo_interact_monthc=lme(fixed=tumour~sensitivity+line*month,random=list(patient=pdBlocked(list(pdIdent(~1), pdIdent(~line-1)))),data=Chemo,method='ML')
+summary(lme_Chemo_interact_monthc)
+lme_Chemo_interact_monthd=lme(fixed=tumour~sensitivity+line*month,random=list(patient=pdBlocked(list(pdIdent(~1), pdIdent(~month-1),pdIdent(~line-1)))),data=Chemo,method='ML')
+summary(lme_Chemo_interact_monthd)
+
+anova(lme_Chemo_interact_month,lme_Chemo_interact_monthb)
+anova(lme_Chemo_interact_month,lme_Chemo_interact_monthc)
+anova(lme_Chemo_interact_month,lme_Chemo_interact_monthd)
+#The LRT do not reject the initial model so we don't add any new random effects !
+
 # – equal variance of the responses around the different factor’s levels
 
 plot.design(Chemo)
